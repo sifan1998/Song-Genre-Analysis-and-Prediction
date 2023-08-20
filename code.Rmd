@@ -1,0 +1,447 @@
+---
+title: "Final Report"
+author: "Sifan Xu"
+date: '2022-08-10'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Executive summary
+
+Spotify is the world's largest music streaming service provider. Its founders are interested in trying to predict what kind of songs belong to, so as to better improve the customer experience. They are interested in how the year, speechiness, danceability and tempo of the songs will affect the genre of songs.
+
+The founders provided a large data set and asked us to reduce the number of each kinds of songs to 1000 due to the computing power. They are also interested in the popularity of songs in different genres, the difference in speechiness for each genre and the change of track popularity over time.
+
+Next, three models are built to predict genre based on the provided dataset which are linear discriminant analysis(LDA), K-nearest neighbours(KNN) model and random forest. Metrics such as AUC, sensitivity, specificity of the models are analyzed to select the best model.
+
+After analysis, there are four main findings. First, besides EDM, other kinds of songs have similar popularity. Second, rap has the highest speechiness and other kinds of songs have similar speechiness. Third, Rap is becoming more and more popular, and the average popularity of all genres fluctuates over time. Fourth, it could be found that random forest model is the best model and the accuracy of the random forest model is 51.2%
+
+## Methods
+The dataset is available at https://raw.githubusercontent.com/rfordatascience/ tidytuesday/master/data/2020/2020-01-21/spotify_songs.csv which contains 32833 observations and 23 variables. In order to reduce the computation cost, the number of each kinds of songs are reduced to 1000. 
+
+• Does the popularity of songs differ between genres?
+
+In order to analyze the question, I drew a boxplot to analyze the popularity of different songs which is showed in Figure 1. The x-axis is the genre of the songs and the y-axis is the popularity. 
+
+• Is there a difference in speechiness for each genre
+
+For this question, I also drew a boxplot shown in Figure 2 to make analysis. The x-axis is the genre of the songs and the y-axis is the speechiness. 
+
+• How does track popularity change over time?
+
+First, I extracted the year from track_album_release_date. Next, I drew two kinds of the charts to analyze the change of popularity over time. I drew a scatter plot shown in Figure 3 to investigate what kind of songs are becoming more popular. The x-axis is the year and the y-axis is the popularity. Each type of song is represented by dots of different colors. Figure 4 shows the average popularity of all kinds of the songs over year. The x-axis is the year and the y-axis is the popularity.
+
+### Model selection
+In this report, I randomly selected 1000 songs for each song for the computing power at first. After that, I chose year, speechiness, danceability and tempo as predictors which were required by Spotify. Next, I preprocess the data and all the predictor variables have mean computationally 0 and standard deviation 1. After preprocessing the data, I spilt the data into train set and test set. The train set will be used to train the model and the trained model will be tested in the test set to evaluate the metrics of the model. When testing the model, I created confusion matrix and calculate the sensitivity, specificity, accuracy and AUC of the model. The proportion of true positive samples in actual positive samples is called sensitivity and the proportion of true negative samples in actual negative samples is called specificity. AUC is the Area Under ROC curve, while ROC curve is used to test the prediction of two classifications and has little significance in multi classification problems. Therefore, in this model, I use multiclass.roc function to calculate the overall value of the AUC of each genre curve as the AUC of the multiclass model.
+
+• Linear discriminant analysis
+
+Ji and Ye (2008) proposed that LDA is a supervised dimension reduction method. In the process of dimension reduction, the influence of category is considered. LDA is a dimension reduction method based on the best classification effect. Therefore, the sample sets of different classes have the largest classification interval after dimension reduction. In this model, I use discrim library to built the model.The year, speechiness, danceability and tempo are predictors and the response is genre. 
+
+• K-nearest neighbours model
+
+According to Lesmeister (2015), the k-nearest neighbor method is an inert learning algorithm, which can be used for regression and classification. Its main idea is the voting mechanism. For a test case x, find the closest k data on the labeled training data set and vote with their labels. The classification problem is voted. The regression problem uses weighted average or direct average method. In this model, it could be found that the best K is 47 after tuning and the best K is used to fit the model.
+
+• Random forest
+
+Nwanganga and Chapple (2020) explain how to evaluate and select the right model and how to improve model performance using integration methods such as random forest. The forest is composed of many trees, so the results of random forest depend on the results of multiple decision trees. In this model, the number of trees is 100, the mtry is 1 and the n_min is 40. Mtry defines how many predictors we wish to consider at each split, and n_min gives a stopping criterion. After fitting the model, I used vip() function to obtain the importance of the variables in the model.
+
+## Results
+
+• Does the popularity of songs differ between genres?
+
+From Figure 1, it could be found that the edm genre had the lowest median popularity which is approximately 36. The median popularity of r&b genre is around 46 which is higher than edm while lower than other genres. The other genres have similar median popularity which is around 50 and the pop has the highest popularity.
+
+• Is there a difference in speechiness for each genre
+
+From Figure 2, the median speechiness of rap is highest and it could near to 0.19. The other kinds of songs have similar speechiness at about 0.7.
+
+• How does track popularity change over time?
+
+Figure 3 shows that rap is becoming more and more popular. Figure 4 shows that the average popularity of all genres fluctuates over time and it is expected to continue to rise in the next few years.
+
+• Linear discriminant analysis
+
+After evaluating the LDA model, the overall sensitivity is 0.389, the overall specificity is 0.878, the overall AUC is 0.742, the accuracy is 0.386. According to the confusion matrix, the sensitivity of rock is highest which means that it could be easier to predict rock, while the sensitivity of r&b is lowest which means the model would mistake r&b for other genres.
+
+• K-nearest neighbours model
+
+In KNN model, the overall sensitivity is 0.479, the overall specificity is 0.896, the overall AUC is 0.793, the accuracy is 0.479. According to the confusion matrix, r&b and pop have the lowest sensitivity which means it is difficult for the model to predict r&b and pop correctly. The sensitivity of edm is highest which means that it could be easier to predict edm.
+
+• Random forest
+
+In random forest model, the overall sensitivity is 0.512, the overall specificity is 0.903, the overall AUC is 0.811, the accuracy is 0.512. According to the confusion matrix, r&b and pop have the lowest sensitivity which means it is difficult for the model to predict r&b and pop correctly. The sensitivity of edm and rock is highest which means that it could be easier to predict edm and rock. Figure 5 shows the importance of the variables and the year is of the most importance.
+
+## Discussion
+
+The popularity of songs differs between genres, the pop has the highest median popularity over the past 60 years while the edm has the lowest. There is a difference in speechiness between rap and other genres. The speechiness of rap is almost three times as much as other genres, and other genres have the similar speechiness. With the passage of time, the popularity of different songs has also changed, rap has become more and more popular. The average popularity of all genres fluctuates over time and it is expected to continue to rise in the next few years. 
+
+After comparing the models, LDA model has the lowest AUC, sensitivity, specificity and accuracy, it is not appropriate to choose LDA model as the final model. It could be found that random forest model has the highest AUC, sensitivity, specificity and accuracy. The ability of the random forest model to predict edm and rock is similar to that of the KNN model, but the ability to predict the other four songs is stronger than that of the KNN model. Therefore, it is recommend to select random forest model as the final model.
+
+## Conclusion
+
+According to our analysis, the median popularity of pop is the highest over the past 60 years while the edm has the lowest median popularity. The speechiness of rap is almost three times as much as other genres, and other genres have the similar speechiness. Rap has become more and more popular and the average popularity of all genres is expected to rise in the next few years. Therefore, it is suggested that put more effort at rap. 
+
+The best model is random forest model with 100 trees, mtry is 1 and the n_min is 40 which means 100 trees to be considered, 1predictor to consider at each split and stop at 40. This model could predict edm and rock fairly well while is weak in predicting r&b and pop. The overall accuracy of predicting the genre of the songs correctly is 0.512. Among the four predictors asked by Spotify, the year is most important. 
+
+## References
+
+S. Ji and J. Ye, "Generalized Linear Discriminant Analysis: A Unified Framework and Efficient Model Selection," in IEEE Transactions on Neural Networks, vol. 19, no. 10, pp. 1768-1782, Oct. 2008, doi: 10.1109/TNN.2008.2002078.
+
+Lesmeister, C 2015, Mastering machine learning with R : master machine learning techniques with R to deliver insights for complex projects, Packt Publishing, Birmingham.
+
+Nwanganga, FC & Chapple, M 2020, Practical machine learning in R, John Wiley and Sons, Indianapolis.
+
+## Appendix
+```{r library, message=FALSE, warning=FALSE}
+#load the library
+library(tidyverse)
+library(dplyr)
+library(rsample)
+library(recipes)
+library(discrim)
+library(yardstick)
+library(pROC)
+library(caret)
+library(tune)
+library(kknn)
+library(parsnip)
+library(tidymodels)
+library(vip)
+```
+
+```{r 1_1}
+#load the dataset
+spotify_songs <-readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-21/spotify_songs.csv')
+skimr::skim_without_charts(spotify_songs)
+```
+
+```{r 1_2, message=FALSE, warning=FALSE}
+
+df <- spotify_songs %>%
+  select(playlist_genre,track_popularity,track_album_release_date,speechiness,danceability,tempo) %>% 
+  drop_na()
+
+df <- df %>% 
+  mutate(year = substr(track_album_release_date, 1, 4))
+
+
+df$playlist_genre=factor(df$playlist_genre)
+
+skimr::skim_without_charts(df)
+```
+
+```{r reduce}
+set.seed(2022)
+
+df_edm = df %>% 
+  filter(playlist_genre=="edm")
+df_edm=df_edm[sample(nrow(df_edm),1000,replace=F),]
+
+df_latin = df %>% 
+  filter(playlist_genre=="latin")
+df_latin=df_latin[sample(nrow(df_latin),1000,replace=F),]
+
+df_pop = df %>% 
+  filter(playlist_genre=="pop")
+df_pop=df_pop[sample(nrow(df_pop),1000,replace=F),]
+
+df_rb = df %>% 
+  filter(playlist_genre=="r&b")
+df_rb=df_rb[sample(nrow(df_rb),1000,replace=F),]
+
+df_rap = df %>% 
+  filter(playlist_genre=="rap")
+df_rap=df_rap[sample(nrow(df_rap),1000,replace=F),]
+
+df_rock = df %>% 
+  filter(playlist_genre=="rock")
+df_rock=df_rock[sample(nrow(df_rock),1000,replace=F),]
+
+df = rbind(df_edm, df_latin, df_pop, df_rb, df_rap, df_rock)
+head(df)
+```
+
+```{r popularity_genres_boxplot}
+ggplot(df, aes(x=playlist_genre,y=track_popularity, fill = playlist_genre)) + 
+  geom_boxplot() +
+  labs(title = 'Figure1: Boxplot of relationship between popularity and genres',caption = "Figure1: Boxplot of relationship between popularity and genres")+
+  theme(plot.caption = element_text(hjust = 0.5))
+```
+
+```{r speechiness_boxplot}
+ggplot(df, aes(x=playlist_genre,y=speechiness, fill = playlist_genre)) + 
+  geom_boxplot() +
+  labs(title = 'Figure 2: Boxplot of relationship between speechiness and genres', caption = 'Figure 2: Boxplot of relationship between speechiness and genres')+
+  theme(plot.caption = element_text(hjust = 0.5))
+```
+
+```{r popularity_time_scatterplot}
+ggplot(df, aes(x=year,y=track_popularity, col = playlist_genre)) + 
+  geom_point() +
+  labs(title = 'Figure 3: Scatter plot relationship between popularity and time', caption = 'Figure 3: Scatter plot relationship between popularity and time')+
+  theme(plot.caption = element_text(hjust = 0.5))
+```
+
+```{r popularity_time_linerplot}
+# line of mean popularity over year
+mean_popu<-df %>%
+  group_by(year) %>%
+  summarise(mean_popularity = mean(track_popularity))
+
+mean_popu$year<-as.numeric(mean_popu$year)
+ggplot(mean_popu, aes(x=year,y=mean_popularity)) + 
+  geom_point() +
+  geom_line() +
+  geom_smooth(se = F) +
+  scale_x_continuous(breaks = seq(1960, 2020, 5)) +
+  labs(x = "Year",
+       y = "Mean Popularity",
+       title = "Figure 4: Popularity of songs over time",
+       caption = "Figure 4: Popularity of songs over time") +
+  theme_bw() +
+  theme(plot.caption = element_text(hjust = 0.5))
+```
+
+```{r predict}
+# create data frame for model
+df_predict = rbind(df_edm, df_latin, df_pop, df_rb, df_rap, df_rock)
+
+df_predict = df_predict %>% 
+  select(playlist_genre, year, speechiness, danceability,tempo)
+
+
+df_predict$year <- as.numeric(df_predict$year)
+
+df_predict <- data.frame(df_predict)
+
+head(df_predict)
+```
+
+```{r split}
+#split the data
+set.seed(2022)
+df_split=initial_split(df_predict)
+train=training(df_split)
+test=testing(df_split)
+head(train)
+```
+
+```{r preprocess}
+#preprocess the data
+train_recipe = recipe(playlist_genre~.,data=train) %>%
+  themis::step_downsample( playlist_genre ) %>%
+  step_dummy( all_nominal(), -all_outcomes() ) %>%
+  step_normalize( all_predictors() ) %>%
+prep()
+
+train_recipe
+```
+
+```{r juice}
+train_preprocessed=juice(train_recipe)
+test_preprocessed=bake(train_recipe,new_data=test)
+skimr::skim_without_charts(train_preprocessed)
+skimr::skim_without_charts(test_preprocessed)
+```
+
+```{r lda, message=FALSE, warning=FALSE}
+#train lda model
+df_lda <- discrim_linear( mode = "classification" ) %>%
+  set_engine( "MASS" ) %>%
+  fit(playlist_genre ~ year + speechiness + danceability + tempo, data = train_preprocessed)
+df_lda
+```
+
+```{r lda_1}
+#predict lda outcomes
+lda_preds <- predict( df_lda, test_preprocessed ) %>%
+  bind_cols( test_preprocessed %>% select( playlist_genre ) )
+head(lda_preds)
+```
+
+```{r lda_conf_mat}
+#create confusion matrix of lda
+lda_preds %>% conf_mat( truth = playlist_genre, estimate = .pred_class )
+```
+
+```{r lda_sen}
+#calculate overall sensitivity and specificity of lda
+lda_preds %>%
+  sens( truth = playlist_genre, estimate = .pred_class ) %>%
+  bind_rows( lda_preds %>%
+               spec( truth = playlist_genre, estimate = .pred_class ) )
+```
+
+```{r lda_accuracy}
+#calculate accuracy
+mean(test_preprocessed$playlist_genre == lda_preds$.pred_class
+)
+```
+
+```{r lda_roc}
+lda_roc <- predict(df_lda, test_preprocessed, type = "prob")
+colnames(lda_roc) <- c("edm","latin","pop","r&b","rap","rock")
+lda_roc <- as.matrix(lda_roc)
+head(lda_roc)
+```
+
+```{r lda_auc}
+#calculate overall auc of lda
+lda_auc <- multiclass.roc(test_preprocessed$playlist_genre,lda_roc)
+lda_auc
+```
+
+```{r knn}
+#train knn model
+knn_spec <- nearest_neighbor( mode = "classification", neighbors = tune() ) %>%
+  set_engine( "kknn" )
+
+set.seed( 1223 )
+genre_cv <- vfold_cv( train_preprocessed, v = 5 )
+
+k_grid <- grid_regular( neighbors( range = c( 1, 100 ) ), levels = 20 )
+
+knn_tune <- tune_grid(object = knn_spec, preprocessor = recipe(playlist_genre ~ ., data = train_preprocessed), resamples = genre_cv, grid = k_grid )
+
+best_acc <- select_best( knn_tune, "accuracy")
+
+knn_spec_final <- finalize_model( knn_spec, best_acc )
+knn_spec_final
+```
+
+```{r knn_1}
+df_knn <- knn_spec_final %>% 
+  fit( playlist_genre ~ . , data = train_preprocessed )
+
+df_knn
+```
+
+```{r knn_2}
+#show knn model outcomes
+knn_preds <- predict( df_knn, test_preprocessed, type = "class") %>% bind_cols( select( test_preprocessed, playlist_genre) )
+head(knn_preds)
+```
+
+```{r knn_3}
+#create confusion matrix of knn model
+knn_preds %>% conf_mat( truth = playlist_genre, estimate = .pred_class )
+```
+
+```{r knn_sen}
+#calculate overall sensitivity and specificity of knn
+knn_preds %>%
+  sens( truth = playlist_genre, estimate = .pred_class ) %>%
+  bind_rows( knn_preds %>%
+               spec( truth = playlist_genre, estimate = .pred_class ) )
+```
+
+```{r knn_accuracy}
+#show accuracy of knn model
+mean(test_preprocessed$playlist_genre == knn_preds$.pred_class
+)
+```
+
+```{r knn_roc}
+knn_roc <- predict(df_knn, test_preprocessed, type = "prob")
+colnames(knn_roc) <- c("edm","latin","pop","r&b","rap","rock")
+knn_roc <- as.matrix(knn_roc)
+head(knn_roc)
+```
+
+```{r knn_auc}
+#calcualte overall auc of knn
+knn_auc <- multiclass.roc(test_preprocessed$playlist_genre,knn_roc)
+knn_auc
+```
+
+```{r rf}
+#train random forest model
+rf_spec <- rand_forest(
+  mode = "classification",
+  mtry = tune(),
+  trees = 100,
+  min_n = tune()) %>%
+  set_engine( "ranger", importance = "permutation" )
+
+set.seed(2022)
+df_boots <- bootstraps(train_preprocessed, times = 10, strata = playlist_genre)
+
+rand_spec_grid <- grid_regular(
+  finalize(mtry(),
+           train_preprocessed %>%
+             dplyr::select( -playlist_genre ) ),min_n(),levels = 5 )
+
+set.seed(2022)
+rf_grid <- tune_grid( object = rf_spec,
+                      preprocessor = recipe(playlist_genre ~ . , data = train_preprocessed),
+                      resamples = df_boots,
+                      grid = rand_spec_grid )
+
+rf_grid %>% 
+  collect_metrics() %>% 
+  mutate( min_n = as.factor( min_n ) ) %>% 
+  ggplot( aes( x = mtry, y = mean, colour = min_n ) ) +
+  geom_point( size = 2 ) +
+  geom_line( alpha = 0.75 ) +
+  facet_wrap( ~ .metric, scales = "free", nrow = 3 ) +
+  labs(caption = "Figure 5: acc and auc")+
+  theme(plot.caption = element_text(hjust = 0.5))
+
+best_rf_acc <- select_best( rf_grid, "accuracy" )
+
+rf_final <- finalize_model( rf_spec, best_rf_acc )
+
+df_rf <- rf_final %>%
+  fit( playlist_genre~., data = train_preprocessed )
+df_rf
+```
+
+```{r rf_1}
+rf_preds <- predict( df_rf, test_preprocessed ) %>%
+  bind_cols( test_preprocessed %>% select( playlist_genre ) )
+head(rf_preds)
+```
+
+```{r rf_2}
+rf_preds %>% conf_mat( truth = playlist_genre, estimate = .pred_class )
+```
+
+```{r rf_sen}
+#overall sensitivity and specificity of rf
+rf_preds %>%
+  sens( truth = playlist_genre, estimate = .pred_class ) %>%
+  bind_rows( rf_preds %>%
+               spec( truth = playlist_genre, estimate = .pred_class ) )
+```
+
+```{r rf_accuracy}
+#accuracy of rf
+mean(test_preprocessed$playlist_genre == rf_preds$.pred_class
+)
+```
+
+```{r rf_roc}
+rf_roc <- predict(df_rf, test_preprocessed, type = "prob")
+colnames(rf_roc) <- c("edm","latin","pop","r&b","rap","rock")
+rf_roc <- as.matrix(rf_roc)
+head(rf_roc)
+```
+
+```{r rf_auc}
+#overall auc of rf
+rf_auc <- multiclass.roc(test_preprocessed$playlist_genre,rf_roc)
+rf_auc
+```
+```{r rf_vip}
+#importance of variables in rf
+df_rf %>% 
+  vip( ) +
+  labs(caption = "Figure 6: Importance variable for random forest model")+
+  theme(plot.caption = element_text(hjust = 0.5))
+```
